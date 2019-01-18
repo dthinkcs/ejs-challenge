@@ -5,14 +5,13 @@
   <h2>Home</h2>
   <%=homeStartingContent%>
 </p>
-<% for (let i = 0; i < posts.length; i++) {%>
-<p>
-  <h2><%=posts[i].title%></h2>
+
+<% posts.forEach(function(post) { %>
+  <h2><%=post.title%></h2>
   <p>
-    <%=posts[i].content%>
+    <%=post.content%>
   </p>
-</p>
-<% } %>
+<% }); %>
 
 
 
