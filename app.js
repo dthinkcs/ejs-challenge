@@ -19,6 +19,11 @@ app.get("/", function(req, res) {
   res.render("home", {homeStartingContent: homeStartingContent});
 });
 
+app.post("/compose", function(req, res){
+  console.log(req.body.postTitle);
+  res.redirect("/compose");
+});
+
 app.get("/about", function(req, res) {
   res.render("about", {aboutContent: aboutContent});
 });
@@ -29,6 +34,9 @@ app.get("/contact", function(req, res) {
 
 
 
+app.get("/compose", function(req, res) {
+  res.render("compose");
+});
 
 
 
@@ -37,6 +45,6 @@ app.get("/contact", function(req, res) {
 
 
 
-app.listen(3000, function() {
+app.listen(4000, function() {
   console.log("Server started on port 3000");
 });
