@@ -7,6 +7,7 @@ const ejs = require("ejs");
 const homeStartingContent = "The Japanese word shokunin is defined by both Japanese and Japanese-English dictionaries as ‘craftsman’ or ‘artisan,’ but such a literal description does not fully express the deeper meaning. The Japanese apprentice is taught that shokunin means not only having technical skills, but also implies an attitude and social consciousness. … The shokunin has a social obligation to work his/her best for the general welfare of the people. This obligation is both spiritual and material, in that no matter what it is, the shokunin’s responsibility is to fulfill the requirement.The Japanese word shokunin is defined by both Japanese and Japanese-English dictionaries as ‘craftsman’ or ‘artisan,’ but such a literal description does not fully express the deeper meaning. The Japanese apprentice is taught that shokunin means not only having technical skills, but also implies an attitude and social consciousness. … The shokunin has a social obligation to work his/her best for the general welfare of the people. This obligation is both spiritual and material, in that no matter what it is, the shokunin’s responsibility is to fulfill the requirement";
 const aboutContent = "The Spirit Of The Shokunin: You owe it to the universe to SHOW UP and DO your art, CREATE your art.";
 const contactContent = "When you have focused and honestly worked and played the game you were meant to, you can listen to the diffuse whispers of the Shokunin Spirit."
+var posts = [];
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -16,13 +17,13 @@ app.use(express.static("public"));
 
 
 app.get("/", function(req, res) {
-  res.render("home", {homeStartingContent: homeStartingContent});
+  res.render("home", {
+    homeStartingContent: homeStartingContent,
+    posts: posts
+    });
 });
 
-app.post("/compose", function(req, res){
-  console.log(req.body.postTitle);
-  res.redirect("/compose");
-});
+
 
 app.get("/about", function(req, res) {
   res.render("about", {aboutContent: aboutContent});
@@ -38,6 +39,16 @@ app.get("/compose", function(req, res) {
   res.render("compose");
 });
 
+
+app.post("/compose", function(req, res){
+  const post = {
+    title: req.body.postTitle,
+    content: req.body.postBody
+  };
+  posts.push(post);
+  console.log(posts);
+  res.redirect("/");
+});
 
 
 
