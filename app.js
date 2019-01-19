@@ -38,8 +38,13 @@ app.get("/", function(req, res) {
 
 
 
-app.get("/about", function(req, res) {
-  res.render("about", {aboutContent: aboutContent});
+app.get("/about/", function(req, res) {
+  res.render("about", {aboutContent:  aboutContent});
+});
+
+
+app.get("/about/:stuff", function(req, res) {
+  res.render("about", {aboutContent: (req.params.stuff + " " + aboutContent)});
 });
 
 app.get("/contact", function(req, res) {
