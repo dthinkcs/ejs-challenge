@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const _ = require("lodash");
+const mongoose = require("mongoose");
 
 const homeStartingContent = "The Japanese word shokunin is defined by both Japanese and Japanese-English dictionaries as ‘craftsman’ or ‘artisan,’ but such a literal description does not fully express the deeper meaning. The Japanese apprentice is taught that shokunin means not only having technical skills, but also implies an attitude and social consciousness. … The shokunin has a social obligation to work his/her best for the general welfare of the people. This obligation is both spiritual and material, in that no matter what it is, the shokunin’s responsibility is to fulfill the requirement.The Japanese word shokunin is defined by both Japanese and Japanese-English dictionaries as ‘craftsman’ or ‘artisan,’ but such a literal description does not fully express the deeper meaning. The Japanese apprentice is taught that shokunin means not only having technical skills, but also implies an attitude and social consciousness. … The shokunin has a social obligation to work his/her best for the general welfare of the people. This obligation is both spiritual and material, in that no matter what it is, the shokunin’s responsibility is to fulfill the requirement";
 const aboutContent = "The Spirit Of The Shokunin: You owe it to the universe to SHOW UP and DO your art, CREATE your art.";
