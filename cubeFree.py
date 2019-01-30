@@ -1,7 +1,7 @@
 def is_perfect_cube(x):
     x = abs(x)
     return int(round(x ** (1. / 3))) ** 3 == x
-
+#tried week
 
 def cubeFreeIndex(n):
     if n == 1:
