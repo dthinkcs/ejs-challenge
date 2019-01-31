@@ -13,3 +13,4 @@ t = int(input())
 for i in range(t):
   f0, f1, n = tuple(map(int, input().strip().split()))
   print(f(f0, f1, n))
+djd
