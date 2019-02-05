@@ -1,29 +1,37 @@
-def is_perfect_cube(x):
-    x = abs(x)
-    return int(round(x ** (1. / 3))) ** 3 == x
-#tried week
+from math import floor
 
-def cubeFreeIndex(n):
-    if n == 1:
-        return 1
+input_limit = 10** 6
+arr_size = input_limit + 1
+ans = [0] * arr_size
 
-    if is_perfect_cube(n):
-        return -1
+# find cubes -> mark them as -1
+last_check = int(floor(input_limit ** 1/3))
+for i in range(2, last_check + 1):
+    ans[i**3] = -1
 
-    k = 2 # coz we have checked for 1 and n
-    # now we check for [2, (n - 1)]
-    for i in range(2, n):
-        # for all divisors(except 1) MUST BE\
-        if not is_perfect_cube(i):
+# travel along the arr and find wherever -1 then use the sieve to
+# // 2
+for i in range(2, len(ans)):
+    if ans[i] == -1:
+        k = 2
+        j = 2 * i
+        while j < len(ans):
+            ans[j] = -1
             k += 1
-    return k
+            j = k * i
 
+# cumulative frequencies
+prev_non_zero = 0
+for i in range(1, len(ans)):
+    if arr[i] != -1:
+        arr[i] = prev_non_zero + 1
+        prev_non_zero = arr[i]
 
 t = int(input().strip())
 for i in range(t):
     n = int(input().strip())
-    index = cubeFreeIndex(n)
-    if index != -1:
-        print("Case {}: {}".format((i + 1), index))
+    #index = cubeFreeIndex(n)
+    if ans[n] != -1:
+        print("Case {}: {}".format((i + 1), ans[n]))
     else:
         print("Case {}: Not Cube Free".format(i + 1))
