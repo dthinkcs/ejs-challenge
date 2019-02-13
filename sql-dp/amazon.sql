@@ -124,3 +124,133 @@ where
  WHERE O.cust_no = C.cust_no
  GROUP BY C.cust_no
  ORDER BY SUM(O.ORD_AMT) desc;
+
+
+
+--5
+
+select cname
+from customer
+where city is NULL;
+
+
+
+select cname
+from ordr, customer
+where ordr.cust_no = customer.cust_no
+group by ordr.cust_no
+order by sum(ord_amt) DESC
+LIMIT 1; -- another ans
+select cname
+from ordr NATURAL JOIN customer
+group by ordr.cust_no
+order by sum(ord_amt) DESC
+LIMIT 1; -- another answer
+select *
+from (
+select cname
+from ordr NATURAL JOIN customer
+group by ordr.cust_no
+order by sum(ord_amt) DESC
+
+)
+where rownum <= 1; --ANOTHER ans
+select c.cname, max(t1.val) --WRONG
+from
+(
+    select cust_no, sum(ord_amt) as val
+	from ordr
+	group by cust_no
+) as t1 NATURAL JOIN customer c;
+
+-- CORRECT  - find hhe sum, find the max of the sum find where sum = max
+select cname
+from ordr NATURAL JOIN customer
+group by cust_no
+having sum(ord_amt)  = (select max(t1.val)
+    from
+    (
+        select cust_no, sum(ord_amt) as val
+        from ordr
+        group by cust_no
+    ) as t1
+)
+-- all orders not in shipment
+select DISTINCT order_no
+from ordr
+where order_no not in (
+    	select distinct order_no
+    	from shipment
+    );
+
+    -- all items not bought by any customer
+select item_no
+from item
+where item_no not in (
+    	select distinct item_no
+    	from order_item
+
+    );
+
+-- items bought by most customers (max customers)
+-- items bought by most customers (max customers)
+select item_no -- *, count(cust_no)
+from order_item NATURAL JOIN ordr
+group by cust_no
+order by count(cust_no) desc limit 1
+
+select item_no -- *, count(distinct cust_no)
+from order_item NATURAL JOIN ordr
+group by cust_no
+order by count(distinct cust_no) desc limit 1
+
+-- orders not shipped at a specific date
+select order_no
+from shipment
+where ship_date != TO_DATE('02-02-2020', 'dd-MM-yyyy')
+
+-- order no in BOTH two particular dates
+select order_no
+from ((shipment s NATURAL JOIN ordr o) NATURAL JOIN customer c) as t2
+where ship_date = STR_TO_DATE('00-00-0000', 'dd-mm-yyyy')
+ AND order_no IN
+(
+    select order_no
+	from ((shipment s NATURAL JOIN ordr o) NATURAL JOIN customer c) as t2
+	where ship_date = STR_TO_DATE('00-00-0000', 'dd-mm-yyyy')
+)
+
+
+-- customer(s) with maximum number of orders
+
+-- 1. max count of orders by any customer
+-- 2. which cust_no have count(order_no) = thisMaxYouGot
+
+select cname
+from ordr NATURAL JOIN customer
+GROUP BY ordr.cust_no
+HAVING count(order_no) = (
+    select count(order_no)
+	from ordr
+    group by cust_no
+    order by count(order_no) desc
+    limit 1
+)
+
+-- all orders from single warehouse_no
+select o.order_no
+from ordr o
+where o.order_no in (
+  select w.order_no
+  from shipment w
+  where w.order_no = o.order_no
+  group by w.order_no
+  having count(distinct warehouse_no) = 1
+)
+
+
+select w.order_no, c.cname
+from (shipment w NATURAL JOIN ordr o) NATURAL JOIN customer c
+
+group by w.order_no
+having count(distinct warehouse_no) = 1;

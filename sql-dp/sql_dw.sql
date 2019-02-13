@@ -768,3 +768,87 @@ SELECT author_fname, author_lname FROM books;
 SELECT DISTINCT CONCAT(author_fname,' ', author_lname) FROM books;
 
 SELECT DISTINCT author_fname, author_lname FROM books;
+
+--exactly the same
+SELECT * FROM r1, r2 WHERE r1.id = r2.r1_id AND 1;
+
+--finding the book WITH maximum pages
+/*
+7
+The Amazing Adventures of Kavalier & Clay
+634
+*/
+select book_id, title, pages
+from books
+where
+pages = (
+    select MAX(pages) as max_pages
+	from books
+);
+
+select book_id, title, pages
+from books
+order by pages desc limit 1;
+
+select book_id, title, pages
+from books
+where pages = ( select MIN(pages) as max_pages from books );
+
+select book_id, title, pages
+from books
+order by pages asc limit 1;
+
+
+SELECT b.author_lname, b.title, b.pages
+FROM books b, (
+    select author_lname, max(pages) as max_pages
+    from books
+    group by author_lname
+) AS author_max
+
+WHERE   b.author_lname = author_max.author_lname
+		AND
+		b.pages = author_max.max_pages;
+
+
+SELECT b.author_lname as name, b.title, b.pages
+FROM books b, (
+    select author_lname, max(pages) as max_pages
+    from books
+    group by author_lname
+) AS author_max
+
+WHERE   b.author_lname = author_max.author_lname
+		AND
+		b.pages = author_max.max_pages
+ORDER BY b.pages DESC;
+
+-- author_lname, corresponding_title, corresponding_min_pages
+select b.author_lname, b.title, b.pages
+from books b,
+    (select author_lname, min(pages) as min_pages
+    from books
+    group by author_lname) as amin
+where b.author_lname = amin.author_lname
+	  and
+      b.pages = amin.min_pages
+order by b.pages ASC;
+
+-- select authors who have written more than the average ( total number of pages written by all authors )
+select author_lname, total_pages, avg_total_pages
+from
+  (
+    select author_lname, sum(pages) as total_pages
+    from books
+    group by author_lname
+  )
+  as author_pages_sum,
+  (
+    select avg(total_pages) as avg_total_pages
+    from author_pages_sum
+
+  )
+  as author_avg
+where
+  author_pages_sum.total_pages > author_avg.avg_total_pages
+;

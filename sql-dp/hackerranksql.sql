@@ -137,3 +137,50 @@ SELECT
         WHEN A = B OR B = C OR C = A THEN 'Isosceles'
         ELSE 'Scalene' END
 FROM triangles;
+
+
+--Query an alphabetically ordered list of all names in OCCUPATIONS, immediately followed by the first letter of each profession as a parenthetical (i.e.: enclosed in parentheses). For example: AnActorName(A), ADoctorName(D), AProfessorName(P), and ASingerName(S).
+--Query the number of ocurrences of each occupation in OCCUPATIONS. Sort the occurrences in ascending order, and output them in the following format:
+
+--There are a total of [occupation_count] [occupation]s.
+--where [occupation_count] is the number of occurrences of an occupation in OCCUPATIONS and [occupation] is the lowercase occupation name. If more than one Occupation has the same [occupation_count], they should be ordered alphabetically.
+
+select concat(name, '(', substr(upper(occupation), 1, 1), ')')
+from occupations
+order by name ASC;
+--oracleDB
+select concat(concat(name, '('), concat(substr(upper(occupation), 1, 1), ')'))
+from occupations
+order by name ASC;
+
+--You are given a table, BST, containing two columns: N and P, where N represents the value of a node in Binary Tree, and P is the parent of N.
+select concat('There are a total of ', concat(count(occupation), concat( ' ', concat(lower(occupation), 's.'))))
+from occupations
+group by occupation
+order by count(name), occupation;
+select node.n,
+    (case
+        when node.p is NULL then 'Root'
+        when node.n in (select distinct p from bst) then 'Inner'
+        else 'Leaf' end
+    ) as typeNode
+from bst node
+order by n;
+
+--company founder count(M)
+select   cmp.company_code,
+         cmp.founder,
+        (select count(distinct lm.lead_manager_code)
+         from lead_manager lm
+         where lm.company_code = cmp.company_code) as lms,
+         (select count(distinct sm.senior_manager_code)
+         from senior_manager sm
+         where sm.company_code = cmp.company_code),
+         (select count(distinct sm.manager_code)
+         from manager sm
+         where sm.company_code = cmp.company_code),
+         (select count(distinct sm.employee_code)
+         from employee sm
+         where sm.company_code = cmp.company_code)
+from company cmp
+order by company_code;
