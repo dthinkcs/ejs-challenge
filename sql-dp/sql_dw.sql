@@ -852,3 +852,5 @@ from
 where
   author_pages_sum.total_pages > author_avg.avg_total_pages
 ;
+      b.pages = amin.min_pages
+order by b.pages ASC;
