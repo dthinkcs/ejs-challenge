@@ -184,3 +184,5 @@ select   cmp.company_code,
          where sm.company_code = cmp.company_code)
 from company cmp
 order by company_code;
+
+--select sum(cities) where conttinent = 'ASIA'
