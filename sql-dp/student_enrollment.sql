@@ -99,16 +99,96 @@ from book_adoption
 group by course_no
 having count(book_isbn) > 1;
 
+select cname, count(book_isbn)
+from book_adoption natural join course
+group by course_no
+having count(book_isbn) > 1;
+
 --b. List the departments whose ALL course text books are published by a particular publisher.
-select dept
-from course, (
-  select dept, count(*)
-  from (course natural join book_adoption) natural join text
-  group by dept
-  having publisher = 'mcgraw'
+-- DP: HAVING: aggregate logic WHERE : non aggregate
+select table1.dept
+from
+  (
+    select dept, count(*) as total
+    from course
+    group by dept
+  ) as table1,
+  (
+    select dept, count(*) as total
+    from (course natural join book_adoption) natural join text
+    where publisher = 'mcgraw'
+    group by dept
+  ) as table2
+where
+  table1.total = table2.total AND table1.dept = table2.dept;
+
+select c.dept
+from course c
+where course_no in
+  (
+    select course_no from book_adoption where
+    book_isbn=(select book_isbn from text where publisher='mcgraw'));
+
+-- Produce a list of students who are not enrolled.
+-- TESTED 1
+select regno
+from student
+where regno not in (
+  select regno
+  from enroll
+);
+
+-- List the books which are adopted by the course as well as enrolled by the student.
+-- TESTED 1
+select book_isbn
+from text natural join book_adoption
+where course_no in (
+  select distinct course_no
+  from enroll
+);
+
+-- List the courses which has adapted at least two books from a specific publisher.
+select course_no, count(*) as total
+from (course natural join book_adoption) natural join text
+where publisher = 'mcgraw'
+group by course_no
+having count(*)  >= 2
+
+-- Identify the students who are enrolled for maximum number of books.
+select regno
+from enroll natural join book_adoption
+group by regno
+having count(book_isbn) = (
+  select max(table1.tot)
+  from (
+      select count(book_isbn) as tot
+	     from enroll natural join book_adoption
+	      group by regno
+      ) as table1
+);
+-- List the publishers along with the number of books published by them.
+select publisher, count(*)
+from text
+group by publisher;
+
+
+--List the students who are enrolled to all their courses which adopts books. EXCEPT .. MINUS
+--(note: some of the courses need not adopt books)
+select
+from student s
+where not exists (
+  (
+    select distinct course_no
+    from BOOK_ADOPTION
+  )
+  MINUS
+  (
+    select course_no
+    from enroll
+    where s.regno =
+  )
 )
-group by dept
-having count(course_no)
+-- CANT DO THIS = all (select distinct course_no from book_adoption)
 
 
 --1
