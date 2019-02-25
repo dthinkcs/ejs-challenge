@@ -1,38 +1,41 @@
 #include <bits/stdc++.h>
 #define ull unsigned long long int
-#define M 1000000007
+#define mod 1000000007
 using namespace std;
 
-ull numberOfPossibleDecodings(string str, unordered_map<string, int> ans)
+int numberOfPossibleDecodings(string s)
 {
-  if (str.empty())
-    return 0;
+  int n = s.length();
+  ull* ans = new ull[n];
+  for (int i = 0; i < n; i++)
+    ans[i] = 0;
 
-  if (ans.contains(str))
-    return ans[str];
+  ans[0] = 1;
 
-  ull smallOuput1 = numberOfPossibleDecodings(str.substr(1), ans);
-  ull smallOuput2;
-  if ( str.length() > 1 && stoi(str.substr(0, 2)) <= 26 )
-  	smallOutput2 = numberOfPossibleDecodings(str.substr(2), ans);
-
-  ull finalOutput = (smallOuput1 % M + smallOutput2 % M) % M;
-  ans[str] = finalOutput;
-  return finalOutput;
+  for (int i = 1; i < n ; i++)
+  {
+    if (s[i] != '0')
+      ans[i] = ans[i - 1];
+    ull x = (s[i - 1] - '0') * 10 + s[i] - '0';
+    if (x >= 10 && x <= 26 && i > 1)
+      ans[i] += ans[i - 2];
+    else if (x >= 10 && x <= 26)
+      ans[i]++;
+    ans[i] = ans[i] % mod;
+  }
+  return ans[n - 1];
 }
 
 int main()
 {
+  string s;
+
   while(true)
   {
-    string str;
-    cin >> str;
-    if (stoi(str) == 0)
+    cin >> s;
+    if (s == 0) // std::str
       break;
 
-    //unordered_ma
-    cout << numberOfPossibleDecodings(str) << endl;
+    cout << numberOfPossibleDecodings(s) << endl;
   }
-    return 0;
-
 }
