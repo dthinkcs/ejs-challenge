@@ -186,3 +186,26 @@ from company cmp
 order by company_code;
 
 --select sum(cities) where conttinent = 'ASIA'
+
+-- A median is defined as a number separating the higher half of a data set from the lower half. Query the median of the Northern Latitudes (LAT_N) from STATION and round your answer to  decimal places.
+select round((t1.val + t2.val) / 2, 4)
+from (
+    select lat_n as val1, round((count_table.val/2), 0) as round_val
+    from station,
+        (
+            select count(*) as val
+            from station
+        ) as count_table
+    order by lat_n asc
+    limit round_val, 1
+) as t1,
+(
+    select lat_n as val, round((count_table.val + 1) / 2, 0) as round_val
+    from station,
+        (
+            select count(*) as val
+            from station
+        ) as count_table
+    order by lat_n asc
+    limit round_val, 1
+) as t2;
