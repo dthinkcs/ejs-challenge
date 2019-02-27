@@ -194,7 +194,18 @@ where item_no not in (
 
 -- items bought by most customers (max customers)
 -- items bought by most customers (max customers)
-select item_no -- *, count(cust_no)
+select item_no -- , count(*)
+from order_item natural join ordr
+group by item_no
+having count(*) = (
+    select count(*)
+	from order_item natural join ordr
+	group by item_no
+  order by count(*) desc
+    limit 1
+);
+-- customers which have bought max items
+select cust_no -- *, count(cust_no)
 from order_item NATURAL JOIN ordr
 group by cust_no
 order by count(cust_no) desc limit 1
@@ -210,36 +221,39 @@ from shipment
 where ship_date != TO_DATE('02-02-2020', 'dd-MM-yyyy')
 
 -- order no in BOTH two particular dates
+/*
 select order_no
 from ((shipment s NATURAL JOIN ordr o) NATURAL JOIN customer c) as t2
-where ship_date = STR_TO_DATE('00-00-0000', 'dd-mm-yyyy')
+where ship_date = STR_TO_DATE("August 10 2017", "%M %d %Y")
  AND order_no IN
 (
     select order_no
 	from ((shipment s NATURAL JOIN ordr o) NATURAL JOIN customer c) as t2
-	where ship_date = STR_TO_DATE('00-00-0000', 'dd-mm-yyyy')
+	where ship_date = STR_TO_DATE("August 15 2017", "%M %d %Y")
 )
+*/
+select c.cname
+from ((shipment s NATURAL JOIN ordr o) NATURAL JOIN customer c)
+where ship_date = STR_TO_DATE("August 10 2018", "%M %d %Y")
+ AND order_no IN
+(
+    select order_no
+	from shipment s
+	where ship_date = STR_TO_DATE("August 15 2018", "%M %d %Y")
+);
+select c.cname
+from ((shipment s NATURAL JOIN ordr o) NATURAL JOIN customer c)
+where ship_date = STR_TO_DATE("August 10 2018", "%M %d %Y")
+ AND order_no IN
+(
+    select order_no
+	from ((shipment s NATURAL JOIN ordr o) NATURAL JOIN customer c)
+	where ship_date = STR_TO_DATE("August 15 2018", "%M %d %Y")
+);
 
-
--- customer(s) with maximum number of orders
-
--- 1. max count of orders by any customer
--- 2. which cust_no have count(order_no) = thisMaxYouGot
-
-select cname
-from ordr NATURAL JOIN customer
-GROUP BY ordr.cust_no
-HAVING count(order_no) = (
-    select count(order_no)
-	from ordr
-    group by cust_no
-    order by count(order_no) desc
-    limit 1
-)
-
--- all orders from single warehouse_no
-select o.order_no
-from ordr o
+-- all orders from single warehouse_no CORRELATED SUBQUERY
+select o.order_no, c.cname
+from ordr o natural join customer c
 where o.order_no in (
   select w.order_no
   from shipment w
@@ -254,3 +268,49 @@ from (shipment w NATURAL JOIN ordr o) NATURAL JOIN customer c
 
 group by w.order_no
 having count(distinct warehouse_no) = 1;
+
+
+-- customers which have bought max items
+select cust_no -- *, count(cust_no)
+from order_item NATURAL JOIN ordr
+group by cust_no
+order by count(cust_no) desc limit 1
+
+
+-- customer(s) with maximum number of orders
+
+-- 1. max count of orders by any customer
+-- 2. which cust_no have count(order_no) = thisMaxYouGot
+
+select cname
+from ordr NATURAL JOIN customer
+GROUP BY ordr.cust_no
+HAVING count(order_no) = (
+    select count(order_no)
+	  from ordr
+    group by cust_no
+    order by count(order_no) desc
+    limit 1
+)
+-- OPTION 1
+select cust_no
+from ordr
+group by cust_no
+having count(order_no) = (
+  select count(order_no)
+  from ordr
+  group by cust_no
+  order by count(order_no) DESC limit 1
+);
+-- OPTION 2
+select cust_no
+from ordr
+group by cust_no
+having count(order_no) = (
+  select max(count_val)
+  from (
+      select count(order_no) as count_val
+      from ordr
+      group by cust_no
+	) as count_table
+);
