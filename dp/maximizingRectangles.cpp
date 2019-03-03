@@ -1,7 +1,69 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+int kadane(int arr[], int n)
+{
+  int curr_sum = 0;
+  int max_sum = INT_MIN;
+
+  for (int i = 0; i < n; i ++)
+  {
+    curr_sum = curr_sum + arr[i];
+    if (curr_sum > max_sum)
+      max_sum = curr_sum;
+    if (curr_sum < 0)
+       curr_sum = 0;
+  }
+  return max_sum;
+}
+
+void initializeToZero(int* arr, int n)
+{
+  for (int i = 0; i < n; i++)
+    arr[i] = 0;
+}
+
 int main()
+{
+  int n;
+  cin >> n;
+  int m;
+  cin >> m;
+
+  int arr[100][100];
+
+  for (int i = 0; i < n; i++)
+  {
+      for (int j = 0; j < m; j++)
+      {
+          cin >> arr[i][j];
+      }
+  }
+
+  // 1 2 3 4
+  // 5 6 7 8
+  int sumArr = new int[m];
+  int currMax = 0;
+  int maxMax = INT_MIN;
+  for (int left = 0; left < n; left++)
+  {
+    // for every left initialize sumArr to zero
+    initializeToZero(sumArr, m);
+    for (int right = left; right < n; right++)
+    {
+      for (int i = 0; i < m; i++)
+        sumArr[i] += arr[i][right];
+      currMax = kadane(sumArr, m);
+      if (currMax > maxMax)
+        maxMax = currMax;
+    }
+  }
+
+  cout << maxMax << endl;
+}
+
+
+int main2()
 {
     int n;
     cin >> n;
